@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
         const admin = createAdminClient()
         const { data: profile } = await admin
           .from('users')
-          .select('id')
+          .select('id, role')
           .eq('id', user.id)
           .single()
 
@@ -30,6 +30,12 @@ export async function GET(request: NextRequest) {
             role: 'super_admin',
             organization_id: null,
           })
+          return NextResponse.redirect(`${origin}/super-admin`)
+        }
+
+        // Redirect based on role
+        if (profile.role === 'super_admin') {
+          return NextResponse.redirect(`${origin}/super-admin`)
         }
       }
 
