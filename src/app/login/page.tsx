@@ -39,15 +39,28 @@ export default function LoginPage() {
   async function handleGoogleSignIn() {
     setError(null)
     setGoogleLoading(true)
-    const supabase = createClient()
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-    if (error) {
-      setError(error.message)
+    try {
+      const supabase = createClient()
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+      console.log('Google OAuth response:', { data, error })
+      if (error) {
+        console.error('Google OAuth error:', error)
+        setError(error.message)
+        setGoogleLoading(false)
+      }
+      // If successful, Supabase redirects the browser automatically via data.url
+      if (data?.url) {
+        console.log('Redirecting to:', data.url)
+        window.location.href = data.url
+      }
+    } catch (err) {
+      console.error('Google OAuth exception:', err)
+      setError('Failed to connect to Google. Please try again.')
       setGoogleLoading(false)
     }
   }
