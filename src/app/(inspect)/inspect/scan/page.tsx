@@ -36,27 +36,31 @@ export default function ScanPage() {
 
       {/* Manual entry */}
       <div className="px-4 sm:px-6 pb-4">
-        <Card>
-          <CardContent className="py-4 px-4">
-            <p className="text-sm text-muted-foreground mb-3">
-              Or enter the extinguisher ID manually:
+        <Card className="border-t-4 border-t-red-600">
+          <CardContent className="py-5 px-4 space-y-3">
+            <label htmlFor="manual-id" className="text-sm font-semibold block">
+              Manual Entry
+            </label>
+            <p className="text-sm text-muted-foreground">
+              Type the barcode or extinguisher ID printed on the label.
             </p>
             <form onSubmit={handleManualSubmit} className="flex gap-2">
               <Input
+                id="manual-id"
                 type="text"
-                placeholder="Barcode or ID..."
+                placeholder="e.g. FE-2024-001"
                 value={manualId}
                 onChange={(e) => setManualId(e.target.value)}
-                className="flex-1 h-12 text-base"
+                className="flex-1 h-14 text-base font-mono"
               />
               <Button
                 type="submit"
                 size="lg"
                 disabled={!manualId.trim()}
-                className="h-12 px-4"
+                className="h-14 px-5"
               >
-                <Search className="size-5" />
-                <span className="sr-only">Go</span>
+                <Search className="size-5 mr-1.5" />
+                Go
               </Button>
             </form>
           </CardContent>

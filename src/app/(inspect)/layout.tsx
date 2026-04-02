@@ -24,7 +24,7 @@ export default async function InspectLayout({
               <ArrowLeft className="size-5 text-muted-foreground" />
               <span className="sr-only">Back to Dashboard</span>
             </Link>
-            <span className="text-red-600 font-bold text-lg select-none">
+            <span className="text-red-600 font-bold text-lg select-none font-heading tracking-tight">
               FE Tracker
             </span>
           </div>

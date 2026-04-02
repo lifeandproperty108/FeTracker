@@ -30,17 +30,17 @@ export function ChecklistItem({
   return (
     <div
       className={cn(
-        'rounded-xl border-2 p-4 transition-colors',
-        passed === true && 'border-green-500/50 bg-green-50/50 dark:bg-green-950/20',
-        passed === false && 'border-red-500/50 bg-red-50/50 dark:bg-red-950/20',
+        'rounded-xl border-2 p-5 transition-all',
+        passed === true && 'border-green-500 bg-green-50 dark:bg-green-950/20',
+        passed === false && 'border-red-500 bg-red-50 dark:bg-red-950/20',
         passed === null && 'border-border'
       )}
     >
       {/* Item label */}
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <p className="text-sm font-medium leading-snug pt-1">{item.item_label}</p>
+      <div className="flex items-start justify-between gap-3 mb-4">
+        <p className="text-sm font-semibold leading-snug pt-1">{item.item_label}</p>
         {item.is_critical && (
-          <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wider text-destructive bg-destructive/10 rounded px-1.5 py-0.5">
+          <span className="shrink-0 text-[11px] font-bold uppercase tracking-wider text-white bg-red-600 rounded-md px-2 py-1">
             Critical
           </span>
         )}
@@ -53,16 +53,16 @@ export function ChecklistItem({
           aria-label="Pass"
           aria-pressed={passed === true}
           className={cn(
-            'flex-1 flex items-center justify-center gap-2 rounded-lg border-2 py-3 min-h-[48px] text-sm font-medium transition-all active:scale-[0.97]',
+            'flex-1 flex items-center justify-center gap-2.5 rounded-xl border-2 min-h-[56px] text-base font-semibold transition-all active:scale-[0.97]',
             passed === true
-              ? 'border-green-600 bg-green-600 text-white'
+              ? 'border-green-600 bg-green-600 text-white shadow-md'
               : 'border-border text-muted-foreground hover:border-green-400 hover:text-green-600'
           )}
           onClick={() =>
             onChange({ ...value, passed: true })
           }
         >
-          <Check className="size-5" />
+          <Check className="size-6" strokeWidth={2.5} />
           Pass
         </button>
 
@@ -71,16 +71,16 @@ export function ChecklistItem({
           aria-label="Fail"
           aria-pressed={passed === false}
           className={cn(
-            'flex-1 flex items-center justify-center gap-2 rounded-lg border-2 py-3 min-h-[48px] text-sm font-medium transition-all active:scale-[0.97]',
+            'flex-1 flex items-center justify-center gap-2.5 rounded-xl border-2 min-h-[56px] text-base font-semibold transition-all active:scale-[0.97]',
             passed === false
-              ? 'border-red-600 bg-red-600 text-white'
+              ? 'border-red-600 bg-red-600 text-white shadow-md'
               : 'border-border text-muted-foreground hover:border-red-400 hover:text-red-600'
           )}
           onClick={() =>
             onChange({ ...value, passed: false })
           }
         >
-          <X className="size-5" />
+          <X className="size-6" strokeWidth={2.5} />
           Fail
         </button>
       </div>

@@ -60,10 +60,10 @@ export default async function InspectPage() {
       {/* Action cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Link href="/inspect/scan" className="group">
-          <Card className="transition-shadow group-hover:ring-2 group-hover:ring-primary/20 h-full">
+          <Card className="border-t-4 border-t-red-600 transition-shadow hover:shadow-lg h-full">
             <CardContent className="flex flex-col items-center justify-center py-10 px-6 text-center">
-              <div className="mb-4 flex size-16 items-center justify-center rounded-2xl bg-red-50 dark:bg-red-950/30">
-                <QrCode className="size-8 text-red-600 dark:text-red-400" />
+              <div className="mb-4 flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950/30 dark:to-red-900/20">
+                <QrCode className="size-10 text-red-600 dark:text-red-400" />
               </div>
               <h2 className="text-lg font-semibold">Scan QR Code</h2>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -74,10 +74,10 @@ export default async function InspectPage() {
         </Link>
 
         <Link href="/inspect/locations" className="group">
-          <Card className="transition-shadow group-hover:ring-2 group-hover:ring-primary/20 h-full">
+          <Card className="border-t-4 border-t-blue-600 transition-shadow hover:shadow-lg h-full">
             <CardContent className="flex flex-col items-center justify-center py-10 px-6 text-center">
-              <div className="mb-4 flex size-16 items-center justify-center rounded-2xl bg-blue-50 dark:bg-blue-950/30">
-                <MapPin className="size-8 text-blue-600 dark:text-blue-400" />
+              <div className="mb-4 flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/20">
+                <MapPin className="size-10 text-blue-600 dark:text-blue-400" />
               </div>
               <h2 className="text-lg font-semibold">Select Location</h2>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -117,7 +117,7 @@ export default async function InspectPage() {
                   <Card className="transition-colors hover:bg-muted/50">
                     <CardContent className="flex items-center justify-between py-3 px-4">
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium truncate">
+                        <p className="text-sm font-semibold font-mono truncate">
                           {ext?.barcode ?? 'Unknown'}
                         </p>
                         <p className="text-xs text-muted-foreground">

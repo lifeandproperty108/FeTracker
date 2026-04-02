@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { ChecklistItem } from '@/components/inspect/checklist-item'
 import { Loader2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import type {
   Extinguisher,
   InspectionType,
@@ -131,14 +132,19 @@ export function ChecklistForm({
     <div className="pb-24">
       {/* Inspection type selector */}
       <div className="space-y-2">
-        <label className="text-sm font-medium">Inspection Type</label>
+        <label className="text-sm font-semibold">Inspection Type</label>
         <div className="flex flex-wrap gap-2">
           {inspectionTypes.map((type) => (
             <Button
               key={type.id}
               variant={selectedTypeId === type.id ? 'default' : 'outline'}
               size="lg"
-              className="capitalize min-h-[48px]"
+              className={cn(
+                'capitalize min-h-[52px] text-base font-semibold px-6 transition-all',
+                selectedTypeId === type.id
+                  ? 'bg-red-600 hover:bg-red-700 text-white shadow-md'
+                  : ''
+              )}
               onClick={() => handleTypeSelect(type.id)}
               disabled={submitting}
             >
@@ -201,14 +207,26 @@ export function ChecklistForm({
 
       {/* Sticky bottom bar */}
       {templates.length > 0 && (
-        <div className="fixed bottom-0 inset-x-0 z-50 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 px-4 py-3 safe-area-pb">
-          <div className="flex items-center justify-between gap-3 max-w-lg mx-auto">
-            <span className="text-sm text-muted-foreground whitespace-nowrap">
-              {checkedCount} of {totalItems} checked
-            </span>
+        <div className="fixed bottom-0 inset-x-0 z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.08)] border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 px-4 pt-3 pb-3 safe-area-pb">
+          <div className="max-w-lg mx-auto space-y-2.5">
+            {/* Progress bar */}
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                <div
+                  className={cn(
+                    'h-full rounded-full transition-all duration-300',
+                    allChecked ? 'bg-emerald-500' : 'bg-red-600'
+                  )}
+                  style={{ width: `${totalItems > 0 ? (checkedCount / totalItems) * 100 : 0}%` }}
+                />
+              </div>
+              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap tabular-nums">
+                {checkedCount}/{totalItems}
+              </span>
+            </div>
             <Button
               size="lg"
-              className="min-h-[48px] flex-1 max-w-[200px]"
+              className="w-full min-h-[52px] text-base font-semibold"
               disabled={!allChecked || submitting}
               onClick={handleSubmit}
             >

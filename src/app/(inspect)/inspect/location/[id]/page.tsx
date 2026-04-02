@@ -175,16 +175,16 @@ export default async function InspectLocationPage({
                 href={`/inspect/extinguisher/${ext.id}`}
                 className="block"
               >
-                <Card className="transition-colors hover:bg-muted/50 active:bg-muted">
+                <Card className="transition-all hover:shadow-md hover:bg-muted/50 active:bg-muted">
                   <CardContent className="py-4 px-4">
                     <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1 space-y-1">
+                      <div className="min-w-0 flex-1 space-y-1.5">
                         {/* Barcode */}
-                        <p className="text-sm font-semibold truncate">
+                        <p className="text-base font-bold font-mono tracking-tight truncate">
                           {ext.barcode ?? ext.id.slice(0, 8)}
                         </p>
                         {/* Type */}
-                        <p className="text-xs text-muted-foreground capitalize">
+                        <p className="text-sm text-foreground/80 capitalize font-medium">
                           {ext.type.replace(/_/g, ' ')}
                         </p>
                         {/* Specific location */}
@@ -195,11 +195,11 @@ export default async function InspectLocationPage({
                         )}
                       </div>
 
-                      <div className="flex flex-col items-end gap-1.5 shrink-0">
+                      <div className="flex flex-col items-end gap-2 shrink-0">
                         {/* Status badge */}
-                        <Badge variant={config.variant} className="text-xs">
+                        <Badge variant={config.variant} className="text-xs font-semibold px-2.5 py-0.5">
                           <span
-                            className={`mr-1.5 inline-block size-1.5 rounded-full ${config.dotColor}`}
+                            className={`mr-1.5 inline-block size-2 rounded-full ${config.dotColor}`}
                           />
                           {config.label}
                         </Badge>
