@@ -8,6 +8,7 @@ import {
   Flame,
   Plus,
   Pencil,
+  QrCode,
   Trash2,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
@@ -117,17 +118,25 @@ export default async function LocationDetailPage({
             </p>
           )}
         </div>
-        {isAdmin && (
-          <div className="flex gap-2">
-            <Link href={`/dashboard/locations/${id}/edit`}>
-              <Button variant="outline" size="sm">
-                <Pencil className="mr-2 size-4" />
-                Edit
-              </Button>
-            </Link>
-            <DeleteLocationButton locationId={id} locationName={location.name as string} />
-          </div>
-        )}
+        <div className="flex gap-2">
+          <Link href={`/dashboard/locations/${id}/qr-labels`}>
+            <Button variant="outline" size="sm">
+              <QrCode className="mr-2 size-4" />
+              Print QR Labels
+            </Button>
+          </Link>
+          {isAdmin && (
+            <>
+              <Link href={`/dashboard/locations/${id}/edit`}>
+                <Button variant="outline" size="sm">
+                  <Pencil className="mr-2 size-4" />
+                  Edit
+                </Button>
+              </Link>
+              <DeleteLocationButton locationId={id} locationName={location.name as string} />
+            </>
+          )}
+        </div>
       </div>
 
       {/* Stats row */}
