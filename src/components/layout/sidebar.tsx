@@ -80,7 +80,7 @@ export function Sidebar({
 
   if (variant === 'inline') {
     return (
-      <nav className="flex flex-1 flex-col gap-1 p-4 overflow-y-auto">
+      <nav className="flex flex-1 flex-col gap-1.5 p-4 overflow-y-auto">
         {navItems.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -93,10 +93,10 @@ export function Sidebar({
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
                 isActive
-                  ? 'bg-red-600 text-white'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  ? 'border-l-[3px] border-red-600 bg-red-50 text-red-700 dark:bg-red-950/20 dark:text-red-400'
+                  : 'border-l-[3px] border-transparent text-muted-foreground hover:bg-gray-100 hover:text-foreground dark:hover:bg-gray-800'
               )}
             >
               <item.icon className="size-4 shrink-0" />
@@ -115,7 +115,10 @@ export function Sidebar({
 
   return (
     <aside className="hidden lg:flex lg:w-60 lg:flex-col lg:fixed lg:inset-y-0 lg:top-14 lg:border-r lg:border-border bg-background z-30">
-      <nav className="flex flex-1 flex-col gap-1 p-4 overflow-y-auto">
+      <div className="px-4 py-4 border-b border-gray-200 dark:border-gray-800">
+        <span className="font-heading text-red-600 font-bold text-lg select-none">FE Tracker</span>
+      </div>
+      <nav className="flex flex-1 flex-col gap-1.5 p-4 overflow-y-auto">
         {navItems.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -128,10 +131,10 @@ export function Sidebar({
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
                 isActive
-                  ? 'bg-red-600 text-white'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  ? 'border-l-[3px] border-red-600 bg-red-50 text-red-700 dark:bg-red-950/20 dark:text-red-400'
+                  : 'border-l-[3px] border-transparent text-muted-foreground hover:bg-gray-100 hover:text-foreground dark:hover:bg-gray-800'
               )}
             >
               <item.icon className="size-4 shrink-0" />

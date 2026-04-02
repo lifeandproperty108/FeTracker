@@ -58,7 +58,7 @@ export function Header({ userName, orgName, role, showMobileSidebar = true }: He
   }
 
   return (
-    <header className="sticky top-0 z-40 h-14 border-b border-border bg-background">
+    <header className="sticky top-0 z-40 h-14 border-b border-gray-200 dark:border-gray-800 bg-background">
       <div className="flex h-full items-center justify-between px-4">
         {/* Left side */}
         <div className="flex items-center gap-3">
@@ -72,16 +72,16 @@ export function Header({ userName, orgName, role, showMobileSidebar = true }: He
                 <span className="sr-only">Open menu</span>
               </SheetTrigger>
               <SheetContent side="left" className="w-60 p-0">
-                <SheetHeader className="border-b border-border px-4 py-3">
+                <SheetHeader className="border-b border-gray-200 dark:border-gray-800 px-4 py-3">
                   <SheetTitle>
-                    <span className="text-red-600 font-bold text-lg">FE Tracker</span>
+                    <span className="font-heading text-red-600 font-bold text-lg">FE Tracker</span>
                   </SheetTitle>
                 </SheetHeader>
                 <Sidebar role={role} variant="inline" />
               </SheetContent>
             </Sheet>
           )}
-          <span className="text-red-600 font-bold text-lg select-none">FE Tracker</span>
+          <span className="font-heading text-red-600 font-bold text-lg select-none">FE Tracker</span>
         </div>
 
         {/* Right side */}
@@ -92,24 +92,24 @@ export function Header({ userName, orgName, role, showMobileSidebar = true }: He
 
           <DropdownMenu>
             <DropdownMenuTrigger
-              className="flex items-center gap-2 rounded-lg p-1 hover:bg-muted transition-colors outline-none"
+              className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 outline-none"
             >
-              <Avatar size="sm">
+              <Avatar size="sm" className="ring-2 ring-gray-200 dark:ring-gray-700">
                 <AvatarFallback>{getInitials(userName)}</AvatarFallback>
               </Avatar>
-              <Badge variant="secondary" className="hidden sm:inline-flex text-[10px]">
+              <Badge variant="outline" className="hidden sm:inline-flex text-[10px] px-1.5 py-0">
                 {formatRole(role)}
               </Badge>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" side="bottom" sideOffset={8}>
-              <DropdownMenuLabel>
-                <div className="flex flex-col">
+            <DropdownMenuContent align="end" side="bottom" sideOffset={8} className="w-56">
+              <DropdownMenuLabel className="py-3">
+                <div className="flex flex-col gap-0.5">
                   <span className="text-sm font-medium">{userName}</span>
                   <span className="text-xs text-muted-foreground">{orgName}</span>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut}>
+              <DropdownMenuItem onClick={handleSignOut} className="py-2">
                 <LogOut className="size-4" />
                 Sign out
               </DropdownMenuItem>

@@ -63,7 +63,7 @@ export function MobileNav({ role }: { role: UserRole }) {
   const navItems = getMobileNavItems(role)
 
   return (
-    <nav className="lg:hidden fixed bottom-0 inset-x-0 z-50 border-t border-border bg-background">
+    <nav className="lg:hidden fixed bottom-0 inset-x-0 z-50 border-t border-gray-200 dark:border-gray-800 bg-background">
       <div className="flex items-center justify-around h-16 px-2">
         {navItems.map((item) => {
           const isActive =
@@ -77,7 +77,7 @@ export function MobileNav({ role }: { role: UserRole }) {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex flex-col items-center gap-1 px-3 py-1.5 rounded-lg text-xs transition-colors min-w-0',
+                'flex flex-col items-center gap-1 px-3 py-1.5 rounded-lg text-xs transition-all duration-200 min-w-0 relative',
                 isActive
                   ? 'text-red-600 font-medium'
                   : 'text-muted-foreground'
@@ -85,11 +85,14 @@ export function MobileNav({ role }: { role: UserRole }) {
             >
               <item.icon
                 className={cn(
-                  'size-5',
+                  'h-5 w-5 transition-colors duration-200',
                   isActive && 'text-red-600'
                 )}
               />
               <span className="truncate">{item.label}</span>
+              {isActive && (
+                <span className="absolute bottom-1.5 h-1 w-1 rounded-full bg-red-600" />
+              )}
             </Link>
           )
         })}
@@ -109,8 +112,8 @@ export function InspectMobileNav() {
   ]
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-50 border-t border-border bg-background">
-      <div className="flex items-center justify-around h-16 px-2">
+    <nav className="fixed bottom-0 inset-x-0 z-50 border-t border-gray-200 dark:border-gray-800 bg-background safe-area-pb">
+      <div className="flex items-center justify-around h-[68px] px-2">
         {items.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -121,19 +124,22 @@ export function InspectMobileNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex flex-col items-center gap-1 px-3 py-1.5 rounded-lg text-xs transition-colors min-w-0',
+                'flex flex-col items-center gap-1 px-4 py-2 rounded-xl text-xs transition-all duration-200 min-w-[64px] min-h-[48px] justify-center relative',
                 isActive
-                  ? 'text-red-600 font-medium'
+                  ? 'text-red-600 font-semibold'
                   : 'text-muted-foreground'
               )}
             >
               <item.icon
                 className={cn(
-                  'size-5',
+                  'h-6 w-6 transition-colors duration-200',
                   isActive && 'text-red-600'
                 )}
               />
               <span className="truncate">{item.label}</span>
+              {isActive && (
+                <span className="absolute bottom-0.5 h-1 w-4 rounded-full bg-red-600" />
+              )}
             </Link>
           )
         })}

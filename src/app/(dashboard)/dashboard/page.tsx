@@ -59,7 +59,7 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       {/* Welcome header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">
+        <h1 className="text-2xl font-bold tracking-tight font-heading">
           Welcome back, {profile.full_name}
         </h1>
         {orgName && (
@@ -70,26 +70,26 @@ export default async function DashboardPage() {
       {/* Stat cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Total */}
-        <Card>
+        <Card className="border-l-4 border-l-gray-400 shadow-sm hover:shadow-md transition-shadow duration-200">
           <CardHeader>
             <CardDescription className="flex items-center gap-2">
               <Flame className="size-4" />
               Total Extinguishers
             </CardDescription>
-            <CardTitle className="text-3xl font-bold tabular-nums">
+            <CardTitle className="text-3xl font-bold tabular-nums font-heading">
               {stats.total_extinguishers}
             </CardTitle>
           </CardHeader>
         </Card>
 
         {/* Compliant */}
-        <Card className="border-emerald-200 bg-emerald-50/50 dark:border-emerald-900 dark:bg-emerald-950/20">
+        <Card className="border-l-4 border-l-emerald-500 border-emerald-200 bg-emerald-50/50 dark:border-emerald-900 dark:bg-emerald-950/20 shadow-sm hover:shadow-md transition-shadow duration-200">
           <CardHeader>
             <CardDescription className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
               <CheckCircle2 className="size-4" />
               Compliant
             </CardDescription>
-            <CardTitle className="text-3xl font-bold tabular-nums text-emerald-700 dark:text-emerald-400">
+            <CardTitle className="text-3xl font-bold tabular-nums font-heading text-emerald-700 dark:text-emerald-400">
               {stats.compliant_count}
               <span className="ml-2 text-sm font-normal text-emerald-600/70 dark:text-emerald-500/70">
                 {pct(stats.compliant_count)}%
@@ -99,13 +99,13 @@ export default async function DashboardPage() {
         </Card>
 
         {/* Due Soon */}
-        <Card className="border-amber-200 bg-amber-50/50 dark:border-amber-900 dark:bg-amber-950/20">
+        <Card className="border-l-4 border-l-amber-500 border-amber-200 bg-amber-50/50 dark:border-amber-900 dark:bg-amber-950/20 shadow-sm hover:shadow-md transition-shadow duration-200">
           <CardHeader>
             <CardDescription className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
               <Clock className="size-4" />
               Due Soon
             </CardDescription>
-            <CardTitle className="text-3xl font-bold tabular-nums text-amber-700 dark:text-amber-400">
+            <CardTitle className="text-3xl font-bold tabular-nums font-heading text-amber-700 dark:text-amber-400">
               {stats.due_soon_count}
               <span className="ml-2 text-sm font-normal text-amber-600/70 dark:text-amber-500/70">
                 {pct(stats.due_soon_count)}%
@@ -115,13 +115,13 @@ export default async function DashboardPage() {
         </Card>
 
         {/* Overdue */}
-        <Card className="border-red-200 bg-red-50/50 dark:border-red-900 dark:bg-red-950/20">
+        <Card className="border-l-4 border-l-red-500 border-red-200 bg-red-50/50 dark:border-red-900 dark:bg-red-950/20 shadow-sm hover:shadow-md transition-shadow duration-200">
           <CardHeader>
             <CardDescription className="flex items-center gap-2 text-red-700 dark:text-red-400">
               <AlertTriangle className="size-4" />
               Overdue
             </CardDescription>
-            <CardTitle className="text-3xl font-bold tabular-nums text-red-700 dark:text-red-400">
+            <CardTitle className="text-3xl font-bold tabular-nums font-heading text-red-700 dark:text-red-400">
               {stats.overdue_count}
               <span className="ml-2 text-sm font-normal text-red-600/70 dark:text-red-500/70">
                 {pct(stats.overdue_count)}%
@@ -135,7 +135,7 @@ export default async function DashboardPage() {
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <Building2 className="size-5 text-muted-foreground" />
-          <h2 className="text-lg font-semibold">Locations</h2>
+          <h2 className="text-lg font-semibold font-heading">Locations</h2>
         </div>
 
         {locations.length === 0 ? (
@@ -161,7 +161,7 @@ export default async function DashboardPage() {
                   href={`/dashboard/locations/${loc.id}`}
                   className="group"
                 >
-                  <Card className="transition-shadow group-hover:ring-2 group-hover:ring-primary/20">
+                  <Card className="shadow-sm hover:shadow-md transition-all duration-200 group-hover:ring-2 group-hover:ring-primary/20">
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="space-y-1">
@@ -206,7 +206,7 @@ export default async function DashboardPage() {
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <ClipboardCheck className="size-5 text-muted-foreground" />
-          <h2 className="text-lg font-semibold">Recent Inspections</h2>
+          <h2 className="text-lg font-semibold font-heading">Recent Inspections</h2>
         </div>
 
         {recentInspections.length === 0 ? (
@@ -216,7 +216,7 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
         ) : (
-          <Card>
+          <Card className="shadow-sm">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
@@ -237,7 +237,7 @@ export default async function DashboardPage() {
                       <TableCell>
                         <Link
                           href={`/dashboard/extinguishers/${insp.extinguisher_id}`}
-                          className="text-primary hover:underline"
+                          className="text-primary hover:underline font-mono text-xs"
                         >
                           {insp.extinguisher_barcode ?? insp.extinguisher_id.slice(0, 8)}
                         </Link>
