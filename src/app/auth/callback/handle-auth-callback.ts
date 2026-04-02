@@ -1,18 +1,18 @@
+import type { Session, User } from '@supabase/supabase-js'
+
 type ExchangeResult = {
   error: { message?: string } | null
 }
 
 type SessionResult = {
   data: {
-    session: {
-      user?: unknown
-    } | null
+    session: Session | null
   }
 }
 
 type UserResult = {
   data: {
-    user: unknown | null
+    user: User | null
   }
 }
 
@@ -60,7 +60,7 @@ export async function resolveAuthCallback({
     data: { session },
   } = await getSession()
 
-  let user = session?.user ?? null
+  let user: User | null = session?.user ?? null
 
   if (!user) {
     const { data } = await getUser()
