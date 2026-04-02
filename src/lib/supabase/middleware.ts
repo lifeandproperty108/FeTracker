@@ -28,25 +28,12 @@ export async function updateSession(request: NextRequest) {
   // If there's an auth code, exchange it for a session in the middleware
   // This is required for PKCE flow — the code verifier is stored in cookies
   // and must be exchanged server-side where cookies are accessible
+  // Exchange PKCE auth code in middleware where cookies are accessible
   const code = request.nextUrl.searchParams.get('code')
   if (code && request.nextUrl.pathname === '/auth/callback') {
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
-      // Successfully exchanged — redirect to the callback page without the code
-      const url = request.nextUrl.clone()
-      url.searchParams.delete('code')
-      const redirectResponse = NextResponse.redirect(url)
-      // Copy session cookies from supabaseResponse to the redirect
-      supabaseResponse.cookies.getAll().forEach(cookie => {
-        redirectResponse.cookies.set(cookie.name, cookie.value, {
-          path: '/',
-          httpOnly: true,
-          secure: true,
-          sameSite: 'lax',
-        })
-      })
-      return redirectResponse
-    }
+    await supabase.auth.exchangeCodeForSession(code)
+    // Don't redirect — let the request continue to the callback page
+    // The session cookies are set on supabaseResponse via setAll
   }
 
   const { data: { user } } = await supabase.auth.getUser()

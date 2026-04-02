@@ -12,16 +12,24 @@ function AuthCallbackContent() {
     const handleCallback = async () => {
       const supabase = createClient()
 
-      // The middleware already exchanged the code for a session
-      // Just check if we have a user now
+      // Try getting the session — the middleware should have exchanged the code
+      // and set session cookies already
       setStatus('Checking session...')
-      const { data: { user }, error } = await supabase.auth.getUser()
-      console.log('Auth callback - user:', user, 'error:', error)
 
+      // First try getSession (reads from cookies/storage)
+      const { data: { session } } = await supabase.auth.getSession()
+      console.log('Auth callback - session:', session ? 'exists' : 'null')
+
+      const user = session?.user
       if (!user) {
-        setStatus('No session found — redirecting to login...')
-        setTimeout(() => router.push('/login'), 2000)
-        return
+        // Try getUser as fallback
+        const { data } = await supabase.auth.getUser()
+        if (!data.user) {
+          console.log('No session or user found, redirecting to login')
+          setStatus('Session not found — redirecting to login...')
+          setTimeout(() => router.push('/login'), 2000)
+          return
+        }
       }
 
       // Ensure profile exists
@@ -37,7 +45,8 @@ function AuthCallbackContent() {
       }
     }
 
-    handleCallback()
+    // Small delay to ensure cookies are set from the middleware response
+    setTimeout(handleCallback, 500)
   }, [router])
 
   return (
