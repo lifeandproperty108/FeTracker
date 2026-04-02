@@ -1,6 +1,8 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY)
+}
 
 export async function sendEmail({
   to,
@@ -11,7 +13,7 @@ export async function sendEmail({
   subject: string
   react: React.ReactElement
 }) {
-  const { data, error } = await resend.emails.send({
+  const { data, error } = await getResend().emails.send({
     from: 'FE Tracker <notifications@fetracker.com>',
     to,
     subject,

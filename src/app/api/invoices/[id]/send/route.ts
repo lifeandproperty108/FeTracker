@@ -9,7 +9,9 @@ import InvoicePdf from '@/components/billing/invoice-pdf'
 import type { InvoicePdfLineItem } from '@/components/billing/invoice-pdf'
 import InvoiceEmail from '@/lib/email/templates/invoice-email'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY)
+}
 
 export async function POST(
   _request: NextRequest,
@@ -93,7 +95,7 @@ export async function POST(
   const viewUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/invoices/${id}`
 
   // Send email with PDF attachment via Resend
-  const { error: sendError } = await resend.emails.send({
+  const { error: sendError } = await getResend().emails.send({
     from: 'FE Tracker <notifications@fetracker.com>',
     to: orgAdmin.email,
     subject: `Invoice #${invoice.invoice_number} from FE Tracker`,
