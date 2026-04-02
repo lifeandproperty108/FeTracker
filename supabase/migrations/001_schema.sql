@@ -214,107 +214,107 @@ ALTER TABLE checklist_templates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE pending_invitations ENABLE ROW LEVEL SECURITY;
 
 -- Helper function: get current user's org_id
-CREATE OR REPLACE FUNCTION auth.user_org_id()
+CREATE OR REPLACE FUNCTION public.user_org_id()
 RETURNS UUID AS $$
   SELECT organization_id FROM public.users WHERE id = auth.uid()
 $$ LANGUAGE SQL SECURITY DEFINER STABLE;
 
 -- Helper function: get current user's role
-CREATE OR REPLACE FUNCTION auth.user_role()
+CREATE OR REPLACE FUNCTION public.user_role()
 RETURNS user_role AS $$
   SELECT role FROM public.users WHERE id = auth.uid()
 $$ LANGUAGE SQL SECURITY DEFINER STABLE;
 
 -- Organizations: users see only their own org
 CREATE POLICY "org_select" ON organizations FOR SELECT
-  USING (id = auth.user_org_id());
+  USING (id = public.user_org_id());
 CREATE POLICY "org_update" ON organizations FOR UPDATE
-  USING (id = auth.user_org_id() AND auth.user_role() = 'org_admin');
+  USING (id = public.user_org_id() AND public.user_role() = 'org_admin');
 
 -- Users: see users in same org
 CREATE POLICY "users_select" ON users FOR SELECT
-  USING (organization_id = auth.user_org_id() OR id = auth.uid());
+  USING (organization_id = public.user_org_id() OR id = auth.uid());
 CREATE POLICY "users_insert" ON users FOR INSERT
   WITH CHECK (TRUE); -- Controlled by application logic during signup/invite
 CREATE POLICY "users_update" ON users FOR UPDATE
-  USING (id = auth.uid() OR (organization_id = auth.user_org_id() AND auth.user_role() = 'org_admin'));
+  USING (id = auth.uid() OR (organization_id = public.user_org_id() AND public.user_role() = 'org_admin'));
 
 -- Locations: scoped to org
 CREATE POLICY "locations_select" ON locations FOR SELECT
-  USING (organization_id = auth.user_org_id());
+  USING (organization_id = public.user_org_id());
 CREATE POLICY "locations_insert" ON locations FOR INSERT
-  WITH CHECK (organization_id = auth.user_org_id() AND auth.user_role() IN ('org_admin', 'facility_manager'));
+  WITH CHECK (organization_id = public.user_org_id() AND public.user_role() IN ('org_admin', 'facility_manager'));
 CREATE POLICY "locations_update" ON locations FOR UPDATE
-  USING (organization_id = auth.user_org_id() AND auth.user_role() IN ('org_admin', 'facility_manager'));
+  USING (organization_id = public.user_org_id() AND public.user_role() IN ('org_admin', 'facility_manager'));
 CREATE POLICY "locations_delete" ON locations FOR DELETE
-  USING (organization_id = auth.user_org_id() AND auth.user_role() = 'org_admin');
+  USING (organization_id = public.user_org_id() AND public.user_role() = 'org_admin');
 
 -- Extinguishers: scoped to org
 CREATE POLICY "ext_select" ON extinguishers FOR SELECT
-  USING (organization_id = auth.user_org_id());
+  USING (organization_id = public.user_org_id());
 CREATE POLICY "ext_insert" ON extinguishers FOR INSERT
-  WITH CHECK (organization_id = auth.user_org_id());
+  WITH CHECK (organization_id = public.user_org_id());
 CREATE POLICY "ext_update" ON extinguishers FOR UPDATE
-  USING (organization_id = auth.user_org_id());
+  USING (organization_id = public.user_org_id());
 CREATE POLICY "ext_delete" ON extinguishers FOR DELETE
-  USING (organization_id = auth.user_org_id() AND auth.user_role() = 'org_admin');
+  USING (organization_id = public.user_org_id() AND public.user_role() = 'org_admin');
 
 -- Inspections: scoped to org
 CREATE POLICY "insp_select" ON inspections FOR SELECT
-  USING (organization_id = auth.user_org_id());
+  USING (organization_id = public.user_org_id());
 CREATE POLICY "insp_insert" ON inspections FOR INSERT
-  WITH CHECK (organization_id = auth.user_org_id() AND auth.user_role() IN ('technician', 'org_admin'));
+  WITH CHECK (organization_id = public.user_org_id() AND public.user_role() IN ('technician', 'org_admin'));
 
 -- Inspection Items: via inspection's org
 CREATE POLICY "insp_items_select" ON inspection_items FOR SELECT
-  USING (inspection_id IN (SELECT id FROM inspections WHERE organization_id = auth.user_org_id()));
+  USING (inspection_id IN (SELECT id FROM inspections WHERE organization_id = public.user_org_id()));
 CREATE POLICY "insp_items_insert" ON inspection_items FOR INSERT
-  WITH CHECK (inspection_id IN (SELECT id FROM inspections WHERE organization_id = auth.user_org_id()));
+  WITH CHECK (inspection_id IN (SELECT id FROM inspections WHERE organization_id = public.user_org_id()));
 
 -- Notifications Log: scoped to org via extinguisher
 CREATE POLICY "notif_select" ON notifications_log FOR SELECT
-  USING (extinguisher_id IN (SELECT id FROM extinguishers WHERE organization_id = auth.user_org_id()));
+  USING (extinguisher_id IN (SELECT id FROM extinguishers WHERE organization_id = public.user_org_id()));
 
 -- Quotes: scoped to org
 CREATE POLICY "quotes_select" ON quotes FOR SELECT
-  USING (organization_id = auth.user_org_id());
+  USING (organization_id = public.user_org_id());
 CREATE POLICY "quotes_insert" ON quotes FOR INSERT
-  WITH CHECK (organization_id = auth.user_org_id());
+  WITH CHECK (organization_id = public.user_org_id());
 CREATE POLICY "quotes_update" ON quotes FOR UPDATE
-  USING (organization_id = auth.user_org_id());
+  USING (organization_id = public.user_org_id());
 
 -- Invoices: scoped to org
 CREATE POLICY "invoices_select" ON invoices FOR SELECT
-  USING (organization_id = auth.user_org_id());
+  USING (organization_id = public.user_org_id());
 CREATE POLICY "invoices_insert" ON invoices FOR INSERT
-  WITH CHECK (organization_id = auth.user_org_id());
+  WITH CHECK (organization_id = public.user_org_id());
 CREATE POLICY "invoices_update" ON invoices FOR UPDATE
-  USING (organization_id = auth.user_org_id());
+  USING (organization_id = public.user_org_id());
 
 -- Line Items: via quote or invoice org
 CREATE POLICY "line_items_select" ON line_items FOR SELECT
   USING (
-    (quote_id IN (SELECT id FROM quotes WHERE organization_id = auth.user_org_id()))
+    (quote_id IN (SELECT id FROM quotes WHERE organization_id = public.user_org_id()))
     OR
-    (invoice_id IN (SELECT id FROM invoices WHERE organization_id = auth.user_org_id()))
+    (invoice_id IN (SELECT id FROM invoices WHERE organization_id = public.user_org_id()))
   );
 CREATE POLICY "line_items_insert" ON line_items FOR INSERT
   WITH CHECK (
-    (quote_id IN (SELECT id FROM quotes WHERE organization_id = auth.user_org_id()))
+    (quote_id IN (SELECT id FROM quotes WHERE organization_id = public.user_org_id()))
     OR
-    (invoice_id IN (SELECT id FROM invoices WHERE organization_id = auth.user_org_id()))
+    (invoice_id IN (SELECT id FROM invoices WHERE organization_id = public.user_org_id()))
   );
 CREATE POLICY "line_items_update" ON line_items FOR UPDATE
   USING (
-    (quote_id IN (SELECT id FROM quotes WHERE organization_id = auth.user_org_id()))
+    (quote_id IN (SELECT id FROM quotes WHERE organization_id = public.user_org_id()))
     OR
-    (invoice_id IN (SELECT id FROM invoices WHERE organization_id = auth.user_org_id()))
+    (invoice_id IN (SELECT id FROM invoices WHERE organization_id = public.user_org_id()))
   );
 CREATE POLICY "line_items_delete" ON line_items FOR DELETE
   USING (
-    (quote_id IN (SELECT id FROM quotes WHERE organization_id = auth.user_org_id()))
+    (quote_id IN (SELECT id FROM quotes WHERE organization_id = public.user_org_id()))
     OR
-    (invoice_id IN (SELECT id FROM invoices WHERE organization_id = auth.user_org_id()))
+    (invoice_id IN (SELECT id FROM invoices WHERE organization_id = public.user_org_id()))
   );
 
 -- Public read access for reference tables
@@ -323,9 +323,9 @@ CREATE POLICY "checklist_templates_select" ON checklist_templates FOR SELECT USI
 
 -- Pending invitations: org admins can see their org's invitations
 CREATE POLICY "invitations_select" ON pending_invitations FOR SELECT
-  USING (organization_id = auth.user_org_id());
+  USING (organization_id = public.user_org_id());
 CREATE POLICY "invitations_insert" ON pending_invitations FOR INSERT
-  WITH CHECK (organization_id = auth.user_org_id() AND auth.user_role() IN ('org_admin', 'super_admin'));
+  WITH CHECK (organization_id = public.user_org_id() AND public.user_role() IN ('org_admin', 'super_admin'));
 
 -- Updated_at trigger
 CREATE OR REPLACE FUNCTION update_updated_at()
