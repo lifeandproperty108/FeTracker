@@ -33,10 +33,19 @@ export async function updateSession(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
       // Successfully exchanged — redirect to the callback page without the code
-      // The page will detect the session and redirect to the right place
       const url = request.nextUrl.clone()
       url.searchParams.delete('code')
-      return NextResponse.redirect(url)
+      const redirectResponse = NextResponse.redirect(url)
+      // Copy session cookies from supabaseResponse to the redirect
+      supabaseResponse.cookies.getAll().forEach(cookie => {
+        redirectResponse.cookies.set(cookie.name, cookie.value, {
+          path: '/',
+          httpOnly: true,
+          secure: true,
+          sameSite: 'lax',
+        })
+      })
+      return redirectResponse
     }
   }
 
