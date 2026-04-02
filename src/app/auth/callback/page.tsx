@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [status, setStatus] = useState('Signing you in...')
@@ -53,12 +53,26 @@ export default function AuthCallbackPage() {
   }, [router, searchParams])
 
   return (
+    <div className="text-center">
+      <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-red-600 border-t-transparent" />
+      <h2 className="font-heading text-xl font-semibold text-gray-700">{status}</h2>
+      <p className="mt-2 text-sm text-gray-500">Please wait</p>
+    </div>
+  )
+}
+
+export default function AuthCallbackPage() {
+  return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-red-600 border-t-transparent" />
-        <h2 className="font-heading text-xl font-semibold text-gray-700">{status}</h2>
-        <p className="mt-2 text-sm text-gray-500">Please wait</p>
-      </div>
+      <Suspense fallback={
+        <div className="text-center">
+          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-red-600 border-t-transparent" />
+          <h2 className="font-heading text-xl font-semibold text-gray-700">Signing you in...</h2>
+          <p className="mt-2 text-sm text-gray-500">Please wait</p>
+        </div>
+      }>
+        <AuthCallbackContent />
+      </Suspense>
     </div>
   )
 }
