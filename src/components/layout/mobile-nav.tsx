@@ -1,0 +1,143 @@
+'use client'
+
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import {
+  LayoutDashboard,
+  Building2,
+  MapPin,
+  BarChart3,
+  ClipboardList,
+  Receipt,
+  QrCode,
+  Clock,
+  Settings,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import type { UserRole } from '@/lib/types/database'
+
+interface MobileNavItem {
+  label: string
+  href: string
+  icon: React.ComponentType<{ className?: string }>
+}
+
+function getMobileNavItems(role: UserRole): MobileNavItem[] {
+  switch (role) {
+    case 'super_admin':
+      return [
+        { label: 'Dashboard', href: '/super-admin', icon: LayoutDashboard },
+        { label: 'Orgs', href: '/super-admin/organizations', icon: Building2 },
+        { label: 'Invoices', href: '/super-admin/invoices', icon: Receipt },
+      ]
+    case 'org_admin':
+      return [
+        { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+        { label: 'Locations', href: '/dashboard/locations', icon: MapPin },
+        { label: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
+        { label: 'Settings', href: '/dashboard/settings', icon: Settings },
+      ]
+    case 'facility_manager':
+      return [
+        { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+        { label: 'Locations', href: '/dashboard/locations', icon: MapPin },
+        { label: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
+      ]
+    case 'technician':
+      return [
+        { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+        { label: 'Inspect', href: '/inspect', icon: ClipboardList },
+      ]
+    case 'auditor':
+      return [
+        { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+        { label: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
+      ]
+    default:
+      return []
+  }
+}
+
+export function MobileNav({ role }: { role: UserRole }) {
+  const pathname = usePathname()
+  const navItems = getMobileNavItems(role)
+
+  return (
+    <nav className="lg:hidden fixed bottom-0 inset-x-0 z-50 border-t border-border bg-background">
+      <div className="flex items-center justify-around h-16 px-2">
+        {navItems.map((item) => {
+          const isActive =
+            pathname === item.href ||
+            (item.href !== '/dashboard' &&
+              item.href !== '/super-admin' &&
+              pathname.startsWith(item.href))
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                'flex flex-col items-center gap-1 px-3 py-1.5 rounded-lg text-xs transition-colors min-w-0',
+                isActive
+                  ? 'text-red-600 font-medium'
+                  : 'text-muted-foreground'
+              )}
+            >
+              <item.icon
+                className={cn(
+                  'size-5',
+                  isActive && 'text-red-600'
+                )}
+              />
+              <span className="truncate">{item.label}</span>
+            </Link>
+          )
+        })}
+      </div>
+    </nav>
+  )
+}
+
+// Inspect-specific mobile nav
+export function InspectMobileNav() {
+  const pathname = usePathname()
+
+  const items: MobileNavItem[] = [
+    { label: 'Scan', href: '/inspect', icon: QrCode },
+    { label: 'Locations', href: '/inspect/locations', icon: MapPin },
+    { label: 'History', href: '/inspect/history', icon: Clock },
+  ]
+
+  return (
+    <nav className="fixed bottom-0 inset-x-0 z-50 border-t border-border bg-background">
+      <div className="flex items-center justify-around h-16 px-2">
+        {items.map((item) => {
+          const isActive =
+            pathname === item.href ||
+            (item.href !== '/inspect' && pathname.startsWith(item.href))
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                'flex flex-col items-center gap-1 px-3 py-1.5 rounded-lg text-xs transition-colors min-w-0',
+                isActive
+                  ? 'text-red-600 font-medium'
+                  : 'text-muted-foreground'
+              )}
+            >
+              <item.icon
+                className={cn(
+                  'size-5',
+                  isActive && 'text-red-600'
+                )}
+              />
+              <span className="truncate">{item.label}</span>
+            </Link>
+          )
+        })}
+      </div>
+    </nav>
+  )
+}
