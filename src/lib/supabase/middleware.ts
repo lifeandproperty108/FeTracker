@@ -25,12 +25,16 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
+  // If there's an auth code in the URL, let the request through
+  // so the callback can exchange it for a session
+  const hasAuthCode = request.nextUrl.searchParams.has('code')
+
   const { data: { user } } = await supabase.auth.getUser()
 
   const publicPaths = ['/', '/login', '/accept-invite', '/auth/callback']
   const isPublic = publicPaths.some(p => request.nextUrl.pathname === p || request.nextUrl.pathname.startsWith(p + '/'))
 
-  if (!user && !isPublic) {
+  if (!user && !isPublic && !hasAuthCode) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
