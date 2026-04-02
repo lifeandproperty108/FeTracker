@@ -25,16 +25,27 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // If there's an auth code in the URL, let the request through
-  // so the callback can exchange it for a session
-  const hasAuthCode = request.nextUrl.searchParams.has('code')
+  // If there's an auth code, exchange it for a session in the middleware
+  // This is required for PKCE flow — the code verifier is stored in cookies
+  // and must be exchanged server-side where cookies are accessible
+  const code = request.nextUrl.searchParams.get('code')
+  if (code && request.nextUrl.pathname === '/auth/callback') {
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error) {
+      // Successfully exchanged — redirect to the callback page without the code
+      // The page will detect the session and redirect to the right place
+      const url = request.nextUrl.clone()
+      url.searchParams.delete('code')
+      return NextResponse.redirect(url)
+    }
+  }
 
   const { data: { user } } = await supabase.auth.getUser()
 
   const publicPaths = ['/', '/login', '/accept-invite', '/auth/callback']
   const isPublic = publicPaths.some(p => request.nextUrl.pathname === p || request.nextUrl.pathname.startsWith(p + '/'))
 
-  if (!user && !isPublic && !hasAuthCode) {
+  if (!user && !isPublic) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)

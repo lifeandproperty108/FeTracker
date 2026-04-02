@@ -1,34 +1,22 @@
 'use client'
 
 import { Suspense, useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 function AuthCallbackContent() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [status, setStatus] = useState('Signing you in...')
 
   useEffect(() => {
     const handleCallback = async () => {
       const supabase = createClient()
-      const code = searchParams.get('code')
 
-      if (code) {
-        setStatus('Exchanging auth code...')
-        const { error } = await supabase.auth.exchangeCodeForSession(code)
-        if (error) {
-          console.error('Code exchange error:', error)
-          setStatus('Auth failed — redirecting to login...')
-          setTimeout(() => router.push('/login'), 2000)
-          return
-        }
-      }
-
-      // Check for session
+      // The middleware already exchanged the code for a session
+      // Just check if we have a user now
       setStatus('Checking session...')
-      const { data: { user }, error: userError } = await supabase.auth.getUser()
-      console.log('Auth callback - user:', user, 'error:', userError)
+      const { data: { user }, error } = await supabase.auth.getUser()
+      console.log('Auth callback - user:', user, 'error:', error)
 
       if (!user) {
         setStatus('No session found — redirecting to login...')
@@ -50,7 +38,7 @@ function AuthCallbackContent() {
     }
 
     handleCallback()
-  }, [router, searchParams])
+  }, [router])
 
   return (
     <div className="text-center">
