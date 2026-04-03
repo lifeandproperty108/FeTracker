@@ -13,6 +13,7 @@ import {
   Receipt,
   MapPin,
   BarChart3,
+  BookOpen,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -39,11 +40,13 @@ function getNavItems(role: UserRole, hasSelectedOrg?: boolean): NavItem[] {
           { label: 'Invoices', href: '/dashboard/invoices', icon: Receipt },
           { label: 'Inspect', href: '/inspect', icon: ClipboardList },
           { label: 'Settings', href: '/dashboard/settings', icon: Settings },
+          { label: 'Guide', href: '/dashboard/guide', icon: BookOpen },
         ]
       }
       return [
         { label: 'Dashboard', href: '/super-admin', icon: LayoutDashboard },
         { label: 'Organizations', href: '/super-admin/organizations', icon: Building2 },
+        { label: 'Guide', href: '/super-admin/guide', icon: BookOpen },
       ]
     case 'org_admin':
       return [
@@ -54,22 +57,26 @@ function getNavItems(role: UserRole, hasSelectedOrg?: boolean): NavItem[] {
         { label: 'Quotes', href: '/dashboard/quotes', icon: FileText },
         { label: 'Invoices', href: '/dashboard/invoices', icon: Receipt },
         { label: 'Settings', href: '/dashboard/settings', icon: Settings },
+        { label: 'Guide', href: '/dashboard/guide', icon: BookOpen },
       ]
     case 'facility_manager':
       return [
         { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
         { label: 'My Locations', href: '/dashboard/locations', icon: MapPin },
         { label: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
+        { label: 'Guide', href: '/dashboard/guide', icon: BookOpen },
       ]
     case 'technician':
       return [
         { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
         { label: 'Inspect', href: '/inspect', icon: ClipboardList },
+        { label: 'Guide', href: '/dashboard/guide', icon: BookOpen },
       ]
     case 'auditor':
       return [
         { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
         { label: 'Reports', href: '/dashboard/reports', icon: BarChart3, badge: 'Read Only' },
+        { label: 'Guide', href: '/dashboard/guide', icon: BookOpen },
       ]
     default:
       return []

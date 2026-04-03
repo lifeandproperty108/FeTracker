@@ -12,6 +12,7 @@ import {
   QrCode,
   Clock,
   Settings,
+  BookOpen,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { UserRole } from '@/lib/types/database'
@@ -36,6 +37,7 @@ function getMobileNavItems(role: UserRole, hasSelectedOrg?: boolean): MobileNavI
       return [
         { label: 'Dashboard', href: '/super-admin', icon: LayoutDashboard },
         { label: 'Orgs', href: '/super-admin/organizations', icon: Building2 },
+        { label: 'Guide', href: '/super-admin/guide', icon: BookOpen },
       ]
     case 'org_admin':
       return [
@@ -54,11 +56,13 @@ function getMobileNavItems(role: UserRole, hasSelectedOrg?: boolean): MobileNavI
       return [
         { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
         { label: 'Inspect', href: '/inspect', icon: ClipboardList },
+        { label: 'Guide', href: '/dashboard/guide', icon: BookOpen },
       ]
     case 'auditor':
       return [
         { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
         { label: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
+        { label: 'Guide', href: '/dashboard/guide', icon: BookOpen },
       ]
     default:
       return []
