@@ -15,8 +15,8 @@ import {
   TableCell,
 } from '@/components/ui/table'
 import { FireExtinguisher, CheckCircle, Clock, AlertTriangle, ArrowLeft, UserPlus } from 'lucide-react'
-import { format } from 'date-fns'
 import type { Organization, Location, User } from '@/lib/types/database'
+import { formatDateOrFallback } from '@/lib/format-date'
 
 export default async function OrganizationDetailPage({
   params,
@@ -118,7 +118,7 @@ export default async function OrganizationDetailPage({
           <p className="text-sm text-muted-foreground ml-10">
             Slug: <code className="rounded bg-muted px-1 py-0.5">{(org as Organization).slug}</code>
             {' '}&middot;{' '}
-            Created {format(new Date((org as Organization).created_at), 'MMM d, yyyy')}
+            Created {formatDateOrFallback((org as Organization).created_at)}
           </p>
         </div>
         <div className="flex gap-2">
@@ -183,7 +183,7 @@ export default async function OrganizationDetailPage({
                       {loc.facility_manager_email ?? 'Unassigned'}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {format(new Date(loc.created_at), 'MMM d, yyyy')}
+                      {formatDateOrFallback(loc.created_at)}
                     </TableCell>
                   </TableRow>
                 ))
@@ -226,7 +226,7 @@ export default async function OrganizationDetailPage({
                       </Badge>
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {format(new Date(member.created_at), 'MMM d, yyyy')}
+                      {formatDateOrFallback(member.created_at)}
                     </TableCell>
                   </TableRow>
                 ))

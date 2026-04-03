@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { buttonVariants } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -13,7 +13,7 @@ import {
   TableCell,
 } from '@/components/ui/table'
 import { Plus } from 'lucide-react'
-import { format } from 'date-fns'
+import { formatDateOrFallback } from '@/lib/format-date'
 
 export default async function OrganizationsListPage() {
   const supabase = createAdminClient()
@@ -103,7 +103,7 @@ export default async function OrganizationsListPage() {
                       )}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {format(new Date(org.created_at), 'MMM d, yyyy')}
+                      {formatDateOrFallback(org.created_at)}
                     </TableCell>
                   </TableRow>
                 ))
