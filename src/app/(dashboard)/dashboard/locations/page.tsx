@@ -23,7 +23,7 @@ export default async function LocationsPage() {
 
   const { profile } = userData
   const isSuperAdmin = profile.role === 'super_admin'
-  const canCreate = ['org_admin', 'facility_manager'].includes(profile.role)
+  const canCreate = ['super_admin', 'org_admin', 'facility_manager'].includes(profile.role)
 
   const selectedOrgId = isSuperAdmin ? await getSelectedOrgId() : null
   const orgId = selectedOrgId ?? profile.organization_id

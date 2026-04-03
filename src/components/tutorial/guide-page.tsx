@@ -248,12 +248,12 @@ const PERMISSION_AREAS = [
 
 const PERMISSIONS: Record<string, UserRole[]> = {
   Dashboard: ['super_admin', 'org_admin', 'facility_manager', 'technician', 'auditor'],
-  Locations: ['org_admin', 'facility_manager'],
-  Inspections: ['technician', 'org_admin'],
-  Team: ['org_admin'],
-  Reports: ['org_admin', 'facility_manager', 'auditor'],
-  'Quotes/Invoices': ['org_admin'],
-  Settings: ['org_admin'],
+  Locations: ['super_admin', 'org_admin', 'facility_manager'],
+  Inspections: ['super_admin', 'technician', 'org_admin'],
+  Team: ['super_admin', 'org_admin'],
+  Reports: ['super_admin', 'org_admin', 'facility_manager', 'auditor'],
+  'Quotes/Invoices': ['super_admin', 'org_admin'],
+  Settings: ['super_admin', 'org_admin'],
   'System Admin': ['super_admin'],
 }
 

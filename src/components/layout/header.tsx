@@ -1,7 +1,8 @@
 'use client'
 
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { LogOut, Menu } from 'lucide-react'
+import { LogOut, Menu, Settings } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -83,7 +84,9 @@ export function Header({ userName, orgName, role, showMobileSidebar = true, hasS
               </SheetContent>
             </Sheet>
           )}
-          <span className="font-heading text-red-600 font-bold text-lg select-none">FE Tracker</span>
+          <Link href={role === 'super_admin' ? '/super-admin' : '/dashboard'} className="font-heading text-red-600 font-bold text-lg select-none hover:opacity-80 transition-opacity">
+            FE Tracker
+          </Link>
         </div>
 
         {/* Right side */}
@@ -113,6 +116,10 @@ export function Header({ userName, orgName, role, showMobileSidebar = true, hasS
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => router.push('/dashboard/account')} className="py-2">
+                <Settings className="size-4" />
+                Account Settings
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={handleSignOut} className="py-2">
                 <LogOut className="size-4" />
                 Sign out
