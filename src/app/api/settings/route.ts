@@ -61,7 +61,7 @@ export async function PATCH(request: NextRequest) {
 
   const body = await request.json()
 
-  const allowedFields = ['name', 'require_photo_on_failure']
+  const allowedFields = ['name', 'require_photo_on_failure', 'logo_url']
   const updates: Record<string, unknown> = {}
   for (const key of allowedFields) {
     if (key in body) {

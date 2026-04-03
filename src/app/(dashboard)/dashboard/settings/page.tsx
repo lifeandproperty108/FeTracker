@@ -152,7 +152,7 @@ export default function SettingsPage() {
       const res = await fetch('/api/settings', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: org.name }), // no-op update to keep RLS happy
+        body: JSON.stringify({ logo_url: publicUrl }),
       })
 
       if (res.ok) {

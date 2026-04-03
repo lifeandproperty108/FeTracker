@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getUser } from '@/lib/auth/get-user'
 
 export async function GET() {
@@ -77,7 +78,8 @@ export async function POST(request: NextRequest) {
     0
   )
 
-  const supabase = await createClient()
+  const isSuperAdmin = profile.role === 'super_admin'
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   // Create invoice
   const { data: invoice, error: invoiceError } = await supabase

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { LogOut, Menu, Settings } from 'lucide-react'
+import { LogOut, Menu, Settings, Flame } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -84,7 +84,8 @@ export function Header({ userName, orgName, role, showMobileSidebar = true, hasS
               </SheetContent>
             </Sheet>
           )}
-          <Link href={role === 'super_admin' ? '/super-admin' : '/dashboard'} className="font-heading text-red-600 font-bold text-lg select-none hover:opacity-80 transition-opacity">
+          <Link href={role === 'super_admin' ? '/super-admin' : '/dashboard'} className="flex items-center gap-1.5 font-heading text-red-600 font-bold text-lg select-none hover:opacity-80 transition-opacity">
+            <Flame className="size-5 fill-red-600" />
             FE Tracker
           </Link>
         </div>

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getUser } from '@/lib/auth/get-user'
+import { getSelectedOrgId } from '@/lib/org-switcher'
 
 export async function GET() {
   const userData = await getUser()
@@ -41,7 +43,7 @@ export async function POST(request: NextRequest) {
 
   const { profile } = userData
 
-  if (!['org_admin', 'facility_manager'].includes(profile.role)) {
+  if (!['super_admin', 'org_admin', 'facility_manager'].includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
@@ -52,7 +54,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Name is required' }, { status: 400 })
   }
 
-  const supabase = await createClient()
+  const isSuperAdmin = profile.role === 'super_admin'
+  const selectedOrgId = isSuperAdmin ? await getSelectedOrgId() : null
+  const orgId = selectedOrgId ?? profile.organization_id
+
+  if (!orgId) {
+    return NextResponse.json({ error: 'No organization selected' }, { status: 400 })
+  }
+
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   const { data, error } = await supabase
     .from('locations')
@@ -60,7 +70,7 @@ export async function POST(request: NextRequest) {
       name: name.trim(),
       address: address?.trim() || null,
       facility_manager_email: facility_manager_email?.trim() || null,
-      organization_id: profile.organization_id,
+      organization_id: orgId,
     })
     .select()
     .single()
