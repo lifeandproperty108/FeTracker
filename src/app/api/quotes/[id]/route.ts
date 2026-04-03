@@ -14,7 +14,9 @@ export async function GET(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const supabase = await createClient()
+  const { profile } = userData
+  const isSuperAdmin = profile.role === 'super_admin'
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   const { data: quote, error } = await supabase
     .from('quotes')

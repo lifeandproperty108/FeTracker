@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getUser } from '@/lib/auth/get-user'
 
 export async function GET(
@@ -13,7 +14,9 @@ export async function GET(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const supabase = await createClient()
+  const { profile } = userData
+  const isSuperAdmin = profile.role === 'super_admin'
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   const { data: invoice, error } = await supabase
     .from('invoices')
@@ -60,7 +63,8 @@ export async function PATCH(
     }[]
   }
 
-  const supabase = await createClient()
+  const isSuperAdmin = profile.role === 'super_admin'
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   // Build the update payload — only include provided fields
   const updates: Record<string, unknown> = {}

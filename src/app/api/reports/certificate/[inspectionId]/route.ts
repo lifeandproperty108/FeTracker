@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { renderToBuffer } from '@react-pdf/renderer'
 import React from 'react'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getUser } from '@/lib/auth/get-user'
+import { getSelectedOrgId } from '@/lib/org-switcher'
 import {
   InspectionCertificate,
   type InspectionCertificateData,
@@ -21,11 +23,15 @@ export async function GET(
   }
 
   const { profile } = userData
-  if (!profile.organization_id) {
+  const isSuperAdmin = profile.role === 'super_admin'
+  const selectedOrgId = isSuperAdmin ? await getSelectedOrgId() : null
+  const orgId = selectedOrgId ?? profile.organization_id
+
+  if (!orgId) {
     return NextResponse.json({ error: 'No organization' }, { status: 400 })
   }
 
-  const supabase = await createClient()
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   // Fetch inspection with related data
   const { data: inspection, error } = await supabase
@@ -34,7 +40,7 @@ export async function GET(
       'id, performed_at, result, notes, inspection_type_id, technician_id, extinguisher_id'
     )
     .eq('id', inspectionId)
-    .eq('organization_id', profile.organization_id)
+    .eq('organization_id', orgId)
     .single()
 
   if (error || !inspection) {

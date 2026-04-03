@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getUser } from '@/lib/auth/get-user'
+import { getSelectedOrgId } from '@/lib/org-switcher'
 
 export async function GET() {
   const userData = await getUser()
@@ -10,16 +11,20 @@ export async function GET() {
   }
 
   const { profile } = userData
-  const supabase = await createClient()
+  const isSuperAdmin = profile.role === 'super_admin'
+  const selectedOrgId = isSuperAdmin ? await getSelectedOrgId() : null
+  const orgId = selectedOrgId ?? profile.organization_id
+
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   let query = supabase
     .from('quotes')
     .select('*, organization:organizations(id, name)')
     .order('created_at', { ascending: false })
 
-  // Non-super-admins only see their org's quotes
-  if (profile.role !== 'super_admin' && profile.organization_id) {
-    query = query.eq('organization_id', profile.organization_id)
+  // Filter by org if one is determined
+  if (orgId) {
+    query = query.eq('organization_id', orgId)
   }
 
   const { data, error } = await query

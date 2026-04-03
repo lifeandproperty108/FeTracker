@@ -4,6 +4,7 @@ import { renderToBuffer } from '@react-pdf/renderer'
 import { createElement, type ReactElement } from 'react'
 import type { DocumentProps } from '@react-pdf/renderer'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getUser } from '@/lib/auth/get-user'
 import InvoicePdf from '@/components/billing/invoice-pdf'
 import type { InvoicePdfLineItem } from '@/components/billing/invoice-pdf'
@@ -30,7 +31,8 @@ export async function POST(
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  const supabase = await createClient()
+  const isSuperAdmin = profile.role === 'super_admin'
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   // Fetch invoice with org info and line items
   const { data: invoice, error: invoiceError } = await supabase

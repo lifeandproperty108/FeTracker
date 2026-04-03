@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getUser } from '@/lib/auth/get-user'
+import { getSelectedOrgId } from '@/lib/org-switcher'
 
 export async function GET() {
   const userData = await getUser()
@@ -9,12 +10,23 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const supabase = await createClient()
+  const { profile } = userData
+  const isSuperAdmin = profile.role === 'super_admin'
+  const selectedOrgId = isSuperAdmin ? await getSelectedOrgId() : null
+  const orgId = selectedOrgId ?? profile.organization_id
 
-  const { data: invoices, error } = await supabase
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
+
+  let query = supabase
     .from('invoices')
     .select('*, organizations(name), line_items(id)')
     .order('created_at', { ascending: false })
+
+  if (orgId) {
+    query = query.eq('organization_id', orgId)
+  }
+
+  const { data: invoices, error } = await query
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })

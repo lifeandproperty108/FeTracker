@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { renderToBuffer } from '@react-pdf/renderer'
 import React from 'react'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getUser } from '@/lib/auth/get-user'
+import { getSelectedOrgId } from '@/lib/org-switcher'
 import {
   ComplianceReport,
   type ComplianceReportData,
@@ -17,7 +19,11 @@ export async function GET(request: NextRequest) {
   }
 
   const { profile } = userData
-  if (!profile.organization_id) {
+  const isSuperAdmin = profile.role === 'super_admin'
+  const selectedOrgId = isSuperAdmin ? await getSelectedOrgId() : null
+  const orgId = selectedOrgId ?? profile.organization_id
+
+  if (!orgId) {
     return NextResponse.json({ error: 'No organization' }, { status: 400 })
   }
 
@@ -33,20 +39,20 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  const supabase = await createClient()
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   // Fetch organization name
   const { data: org } = await supabase
     .from('organizations')
     .select('name')
-    .eq('id', profile.organization_id)
+    .eq('id', orgId)
     .single()
 
   // Fetch extinguishers (optionally filtered by location)
   let extQuery = supabase
     .from('extinguishers')
     .select('id, barcode, type, status, specific_location, next_monthly_due, next_annual_due, next_6year_due, next_12year_due, location_id, locations(name)')
-    .eq('organization_id', profile.organization_id)
+    .eq('organization_id', orgId)
 
   if (locationId) {
     extQuery = extQuery.eq('location_id', locationId)

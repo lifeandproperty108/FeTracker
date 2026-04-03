@@ -10,12 +10,23 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const supabase = await createClient()
+  const { profile } = userData
+  const isSuperAdmin = profile.role === 'super_admin'
+  const selectedOrgId = isSuperAdmin ? await getSelectedOrgId() : null
+  const orgId = selectedOrgId ?? profile.organization_id
 
-  const { data: locations, error } = await supabase
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
+
+  let query = supabase
     .from('locations')
     .select('*, extinguishers(id, status)')
     .order('name')
+
+  if (orgId) {
+    query = query.eq('organization_id', orgId)
+  }
+
+  const { data: locations, error } = await query
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })

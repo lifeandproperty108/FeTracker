@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getUser } from '@/lib/auth/get-user'
+import { getSelectedOrgId } from '@/lib/org-switcher'
 import { sendEmail } from '@/lib/email/send'
 import { createElement } from 'react'
 import type { ExtinguisherStatus } from '@/lib/types/database'
@@ -173,7 +175,11 @@ export async function POST(request: NextRequest) {
 
   const { profile } = userData
 
-  if (!profile.organization_id) {
+  const isSuperAdmin = profile.role === 'super_admin'
+  const selectedOrgId = isSuperAdmin ? await getSelectedOrgId() : null
+  const orgId = selectedOrgId ?? profile.organization_id
+
+  if (!orgId) {
     return NextResponse.json({ error: 'No organization' }, { status: 400 })
   }
 
@@ -206,7 +212,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const supabase = await createClient()
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
   const performedAt = new Date().toISOString()
 
   // Determine overall result

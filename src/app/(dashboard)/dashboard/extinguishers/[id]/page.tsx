@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getUser } from '@/lib/auth/get-user'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button-variants'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -72,7 +73,8 @@ export default async function ExtinguisherDetailPage({
   const userData = await getUser()
   if (!userData) notFound()
 
-  const supabase = await createClient()
+  const isSuperAdmin = userData.profile.role === 'super_admin'
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   const { data: extinguisher, error } = await supabase
     .from('extinguishers')

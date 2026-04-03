@@ -9,6 +9,7 @@ import {
   FileText,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getUser } from '@/lib/auth/get-user'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -60,7 +61,8 @@ export default async function InvoiceDetailPage({
   const userData = await getUser()
   if (!userData) redirect('/login')
 
-  const supabase = await createClient()
+  const isSuperAdmin = userData.profile.role === 'super_admin'
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   const { data: invoice, error } = await supabase
     .from('invoices')

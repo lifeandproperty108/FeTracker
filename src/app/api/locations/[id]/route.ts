@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getUser } from '@/lib/auth/get-user'
 
 export async function GET(
@@ -13,7 +14,9 @@ export async function GET(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const supabase = await createClient()
+  const { profile } = userData
+  const isSuperAdmin = profile.role === 'super_admin'
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   const { data: location, error } = await supabase
     .from('locations')
@@ -40,7 +43,7 @@ export async function PATCH(
   }
 
   const { profile } = userData
-  if (!['org_admin', 'facility_manager'].includes(profile.role)) {
+  if (!['super_admin', 'org_admin', 'facility_manager'].includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
@@ -58,7 +61,8 @@ export async function PATCH(
     updates.facility_manager_email = body.facility_manager_email?.trim() || null
   }
 
-  const supabase = await createClient()
+  const isSuperAdmin = profile.role === 'super_admin'
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   const { data, error } = await supabase
     .from('locations')
@@ -86,11 +90,12 @@ export async function DELETE(
   }
 
   const { profile } = userData
-  if (profile.role !== 'org_admin') {
+  if (!['super_admin', 'org_admin'].includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  const supabase = await createClient()
+  const isSuperAdmin = profile.role === 'super_admin'
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   const { error } = await supabase
     .from('locations')

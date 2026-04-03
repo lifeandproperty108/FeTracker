@@ -1,5 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getUser } from '@/lib/auth/get-user'
 import { DocumentPreview } from '@/components/billing/document-preview'
 import type { QuoteStatus, LineItem } from '@/lib/types/database'
@@ -14,7 +15,8 @@ export default async function QuoteDetailPage({
   const userData = await getUser()
   if (!userData) redirect('/login')
 
-  const supabase = await createClient()
+  const isSuperAdmin = userData.profile.role === 'super_admin'
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   const { data: quote, error } = await supabase
     .from('quotes')

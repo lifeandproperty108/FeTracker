@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getUser } from '@/lib/auth/get-user'
 import { QRLabelSheet } from '@/components/extinguishers/qr-label-sheet'
 
@@ -15,7 +16,8 @@ export default async function QRLabelsPage({
   const userData = await getUser()
   if (!userData) redirect('/login')
 
-  const supabase = await createClient()
+  const isSuperAdmin = userData.profile.role === 'super_admin'
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   const { data: location, error } = await supabase
     .from('locations')
