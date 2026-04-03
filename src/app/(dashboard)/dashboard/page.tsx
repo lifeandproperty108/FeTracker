@@ -76,7 +76,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div data-tour="dashboard-stats" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Total */}
         <Card className="border-l-4 border-l-gray-400 shadow-sm hover:shadow-md transition-shadow duration-200">
           <CardHeader>
