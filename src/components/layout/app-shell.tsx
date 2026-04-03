@@ -3,6 +3,7 @@ import { Header } from './header'
 import { Sidebar } from './sidebar'
 import { MobileNav } from './mobile-nav'
 import { OrgSwitcher } from './org-switcher'
+import { TourProvider } from '../tutorial/tour-provider'
 import type { UserRole } from '@/lib/types/database'
 
 interface AppShellProps {
@@ -22,6 +23,7 @@ export function AppShell({
   userName,
   selectedOrgId,
   organizations,
+  userId,
 }: AppShellProps) {
   const hasSelectedOrg = role === 'super_admin' && !!selectedOrgId
 
@@ -46,6 +48,7 @@ export function AppShell({
         <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">{children}</div>
       </main>
       <MobileNav role={role} hasSelectedOrg={hasSelectedOrg} />
+      {userId && <TourProvider role={role} userId={userId} />}
     </div>
   )
 }
