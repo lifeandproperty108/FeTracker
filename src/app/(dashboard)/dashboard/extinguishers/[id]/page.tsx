@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import { getUser } from '@/lib/auth/get-user'
 import { createClient } from '@/lib/supabase/server'
 import { Badge } from '@/components/ui/badge'
-import { buttonVariants } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button-variants'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
@@ -12,7 +12,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Separator } from '@/components/ui/separator'
 import Link from 'next/link'
 import type { ExtinguisherType, ExtinguisherStatus, InspectionResult } from '@/lib/types/database'
 import { ExtinguisherQRSection } from './qr-section'

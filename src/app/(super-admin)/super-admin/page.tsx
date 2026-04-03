@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { buttonVariants } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button-variants'
 import { Building2, FireExtinguisher, AlertTriangle, DollarSign, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatDateOrFallback } from '@/lib/format-date'
