@@ -52,3 +52,35 @@ test('redirects to login when no session or user can be recovered', async () => 
     message: 'Session not found — redirecting to login...',
   })
 })
+
+test('can use an existing session without exchanging the code on the client', async () => {
+  const calls: string[] = []
+
+  const result = await resolveAuthCallback({
+    code: 'oauth-code',
+    ensureProfile: async () => ({ role: 'super_admin' }),
+    getSession: async () => {
+      calls.push('getSession')
+      return {
+        data: {
+          session: {
+            user: {
+              id: 'user-1',
+              app_metadata: {},
+              user_metadata: {},
+              aud: 'authenticated',
+              created_at: new Date().toISOString(),
+            } as never,
+          } as never,
+        },
+      }
+    },
+    getUser: async () => {
+      calls.push('getUser')
+      return { data: { user: null } }
+    },
+  })
+
+  assert.deepEqual(calls, ['getSession'])
+  assert.deepEqual(result, { kind: 'redirect', href: '/super-admin' })
+})

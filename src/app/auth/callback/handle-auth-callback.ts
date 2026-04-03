@@ -41,11 +41,11 @@ export async function resolveAuthCallback({
 }: {
   code: string | null
   ensureProfile: () => Promise<EnsureProfileResult>
-  exchangeCodeForSession: (code: string) => Promise<ExchangeResult>
+  exchangeCodeForSession?: (code: string) => Promise<ExchangeResult>
   getSession: () => Promise<SessionResult>
   getUser: () => Promise<UserResult>
 }): Promise<AuthCallbackResolution> {
-  if (code) {
+  if (code && exchangeCodeForSession) {
     const { error } = await exchangeCodeForSession(code)
     if (error) {
       return {

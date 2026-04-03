@@ -25,6 +25,11 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
+  const code = request.nextUrl.searchParams.get('code')
+  if (code && request.nextUrl.pathname === '/auth/callback') {
+    await supabase.auth.exchangeCodeForSession(code)
+  }
+
   const { data: { user } } = await supabase.auth.getUser()
 
   const publicPaths = ['/', '/login', '/accept-invite', '/auth/callback']

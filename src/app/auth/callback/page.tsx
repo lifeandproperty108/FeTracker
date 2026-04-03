@@ -41,11 +41,6 @@ function AuthCallbackContent() {
 
           return { role: data.role as string | undefined }
         },
-        exchangeCodeForSession: async (authCode: string) => {
-          const result = await supabase.auth.exchangeCodeForSession(authCode)
-          console.log('Auth callback - exchange result:', result.error ?? 'success')
-          return { error: result.error }
-        },
         getSession: async () => {
           const result = await supabase.auth.getSession()
           console.log(
