@@ -1,10 +1,10 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { getSupabasePublicConfig } from './config'
+import { getServerSupabasePublicConfig } from './config'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
-  const config = getSupabasePublicConfig()
+  const config = getServerSupabasePublicConfig()
 
   const supabase = createServerClient(
     config.url,

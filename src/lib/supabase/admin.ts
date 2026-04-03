@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
-import { getSupabasePublicConfig } from './config'
+import { getServerSupabasePublicConfig } from './config'
 
 export function createAdminClient() {
-  const config = getSupabasePublicConfig()
+  const config = getServerSupabasePublicConfig()
 
   return createClient(
     config.url,

@@ -1,9 +1,9 @@
 import { createBrowserClient } from '@supabase/ssr'
 import { getBrowserClientOptions } from './browser-client-options'
-import { getSupabasePublicConfig } from './config'
+import { getBrowserSupabasePublicConfig } from './config'
 
 export function createClient() {
-  const config = getSupabasePublicConfig()
+  const config = getBrowserSupabasePublicConfig()
 
   return createBrowserClient(
     config.url,
