@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { Plus, FileText } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getUser } from '@/lib/auth/get-user'
+import { getSelectedOrgId } from '@/lib/org-switcher'
 import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -46,18 +48,24 @@ export default async function QuotesPage({
   if (!userData) redirect('/login')
 
   const { profile } = userData
+  const isSuperAdmin = profile.role === 'super_admin'
   const canCreate = ['super_admin', 'org_admin'].includes(profile.role)
   const resolvedParams = await searchParams
   const filterStatus = resolvedParams.status as QuoteStatus | undefined
 
-  const supabase = await createClient()
+  const selectedOrgId = isSuperAdmin ? await getSelectedOrgId() : null
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   let query = supabase
     .from('quotes')
     .select('*, organization:organizations(id, name)')
     .order('created_at', { ascending: false })
 
-  if (profile.role !== 'super_admin' && profile.organization_id) {
+  if (isSuperAdmin && selectedOrgId) {
+    // Super admin with a selected org — scope to that org
+    query = query.eq('organization_id', selectedOrgId)
+  } else if (!isSuperAdmin && profile.organization_id) {
+    // Regular user — scope to their own org (RLS also enforces this)
     query = query.eq('organization_id', profile.organization_id)
   }
 

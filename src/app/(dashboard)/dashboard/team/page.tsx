@@ -1,6 +1,8 @@
 import { Users, Clock, Mail } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getUser } from '@/lib/auth/get-user'
+import { getSelectedOrgId } from '@/lib/org-switcher'
 import { redirect } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
@@ -42,17 +44,21 @@ export default async function TeamPage() {
     redirect('/dashboard')
   }
 
-  if (!profile.organization_id) {
+  const isSuperAdmin = profile.role === 'super_admin'
+  const selectedOrgId = isSuperAdmin ? await getSelectedOrgId() : null
+  const orgId = selectedOrgId ?? profile.organization_id
+
+  if (!orgId) {
     redirect('/dashboard')
   }
 
-  const supabase = await createClient()
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   // Fetch all members in the organization
   const { data: membersData } = await supabase
     .from('users')
     .select('*')
-    .eq('organization_id', profile.organization_id)
+    .eq('organization_id', orgId)
     .order('full_name')
 
   const members = (membersData ?? []) as User[]
@@ -61,7 +67,7 @@ export default async function TeamPage() {
   const { data: invitationsData } = await supabase
     .from('pending_invitations')
     .select('*')
-    .eq('organization_id', profile.organization_id)
+    .eq('organization_id', orgId)
     .eq('accepted', false)
     .order('created_at', { ascending: false })
 
@@ -77,7 +83,7 @@ export default async function TeamPage() {
           <Users className="size-6 text-muted-foreground" />
           <h1 className="text-2xl font-bold tracking-tight">Team Members</h1>
         </div>
-        {isAdmin && <InviteDialog organizationId={profile.organization_id} />}
+        {isAdmin && <InviteDialog organizationId={orgId} />}
       </div>
 
       {/* Members Table */}

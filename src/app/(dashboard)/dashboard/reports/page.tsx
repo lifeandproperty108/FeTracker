@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getUser } from '@/lib/auth/get-user'
+import { getSelectedOrgId } from '@/lib/org-switcher'
 import { redirect } from 'next/navigation'
 import { FileText, Download, ClipboardCheck } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
@@ -10,15 +12,19 @@ export default async function ReportsPage() {
   if (!userData) redirect('/login')
 
   const { profile } = userData
-  if (!profile.organization_id) redirect('/dashboard')
+  const isSuperAdmin = profile.role === 'super_admin'
+  const selectedOrgId = isSuperAdmin ? await getSelectedOrgId() : null
+  const orgId = selectedOrgId ?? profile.organization_id
 
-  const supabase = await createClient()
+  if (!orgId) redirect('/dashboard')
+
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   // Fetch locations for filter dropdown
   const { data: locations } = await supabase
     .from('locations')
     .select('id, name')
-    .eq('organization_id', profile.organization_id)
+    .eq('organization_id', orgId)
     .order('name')
 
   // Fetch recent inspections for certificate downloads
@@ -27,7 +33,7 @@ export default async function ReportsPage() {
     .select(
       'id, performed_at, result, extinguisher_id, extinguishers(barcode, type, locations(name)), users!inspections_technician_id_fkey(full_name), inspection_types(name)'
     )
-    .eq('organization_id', profile.organization_id)
+    .eq('organization_id', orgId)
     .order('performed_at', { ascending: false })
     .limit(20)
 

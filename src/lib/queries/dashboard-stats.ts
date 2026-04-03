@@ -27,25 +27,61 @@ export interface DashboardData {
 }
 
 export async function getDashboardStats(
-  supabase: SupabaseClient
+  supabase: SupabaseClient,
+  orgId?: string
 ): Promise<DashboardData> {
-  // Run all queries in parallel — RLS handles org scoping
-  const [extinguishersRes, locationsRes, inspectionsRes] = await Promise.all([
-    supabase.from('extinguishers').select('id, status, location_id'),
-    supabase.from('locations').select('id, name, address'),
-    supabase
-      .from('inspections')
-      .select(
-        'id, performed_at, result, extinguisher_id, inspection_type_id, extinguishers(barcode, location_id), inspection_types(name)'
-      )
-      .order('performed_at', { ascending: false })
-      .limit(10),
+  // Build queries — when orgId is provided (super_admin), scope manually;
+  // otherwise RLS handles org scoping automatically.
+  let locationsQuery = supabase.from('locations').select('id, name, address')
+  if (orgId) {
+    locationsQuery = locationsQuery.eq('organization_id', orgId)
+  }
+
+  const locationsRes = await locationsQuery
+
+  const locations: Pick<Location, 'id' | 'name' | 'address'>[] =
+    locationsRes.data ?? []
+  const locationIds = locations.map((l) => l.id)
+
+  // For extinguishers: they belong to locations, so filter by location IDs
+  let extinguishersQuery = supabase
+    .from('extinguishers')
+    .select('id, status, location_id')
+  if (orgId && locationIds.length > 0) {
+    extinguishersQuery = extinguishersQuery.in('location_id', locationIds)
+  } else if (orgId && locationIds.length === 0) {
+    // No locations for this org — return empty results
+    return {
+      stats: {
+        total_extinguishers: 0,
+        compliant_count: 0,
+        due_soon_count: 0,
+        overdue_count: 0,
+        out_of_service_count: 0,
+      },
+      locations: [],
+      recentInspections: [],
+    }
+  }
+
+  let inspectionsQuery = supabase
+    .from('inspections')
+    .select(
+      'id, performed_at, result, extinguisher_id, inspection_type_id, extinguishers(barcode, location_id), inspection_types(name)'
+    )
+    .order('performed_at', { ascending: false })
+    .limit(10)
+  if (orgId) {
+    inspectionsQuery = inspectionsQuery.eq('organization_id', orgId)
+  }
+
+  const [extinguishersRes, inspectionsRes] = await Promise.all([
+    extinguishersQuery,
+    inspectionsQuery,
   ])
 
   const extinguishers: Pick<Extinguisher, 'id' | 'status' | 'location_id'>[] =
     extinguishersRes.data ?? []
-  const locations: Pick<Location, 'id' | 'name' | 'address'>[] =
-    locationsRes.data ?? []
 
   // Build stats
   const stats: DashboardStats = {

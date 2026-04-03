@@ -8,7 +8,9 @@ import {
   Flame,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getUser } from '@/lib/auth/get-user'
+import { getSelectedOrgId } from '@/lib/org-switcher'
 import { getDashboardStats } from '@/lib/queries/dashboard-stats'
 import {
   Card,
@@ -34,21 +36,27 @@ export default async function DashboardPage() {
 
   const { profile } = userData
 
-  const supabase = await createClient()
+  const isSuperAdmin = profile.role === 'super_admin'
+  const selectedOrgId = isSuperAdmin ? await getSelectedOrgId() : null
+  const orgId = selectedOrgId ?? profile.organization_id
+
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   // Fetch org name
   let orgName = ''
-  if (profile.organization_id) {
+  if (orgId) {
     const { data: org } = await supabase
       .from('organizations')
       .select('name')
-      .eq('id', profile.organization_id)
+      .eq('id', orgId)
       .single()
     if (org) orgName = org.name
   }
 
-  const { stats, locations, recentInspections } =
-    await getDashboardStats(supabase)
+  const { stats, locations, recentInspections } = await getDashboardStats(
+    supabase,
+    isSuperAdmin ? (orgId ?? undefined) : undefined
+  )
 
   const pct = (count: number) =>
     stats.total_extinguishers > 0

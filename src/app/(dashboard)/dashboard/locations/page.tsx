@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { Plus, Building2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getUser } from '@/lib/auth/get-user'
+import { getSelectedOrgId } from '@/lib/org-switcher'
 import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -20,15 +22,24 @@ export default async function LocationsPage() {
   if (!userData) redirect('/login')
 
   const { profile } = userData
+  const isSuperAdmin = profile.role === 'super_admin'
   const canCreate = ['org_admin', 'facility_manager'].includes(profile.role)
 
-  const supabase = await createClient()
+  const selectedOrgId = isSuperAdmin ? await getSelectedOrgId() : null
+  const orgId = selectedOrgId ?? profile.organization_id
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
   // Fetch locations with extinguisher counts
-  const { data: locations } = await supabase
+  let query = supabase
     .from('locations')
     .select('*, extinguishers(id, status)')
     .order('name')
+
+  if (isSuperAdmin && orgId) {
+    query = query.eq('organization_id', orgId)
+  }
+
+  const { data: locations } = await query
 
   const rows = (locations ?? []).map((loc) => {
     const extinguishers = (loc.extinguishers as { id: string; status: string }[]) ?? []

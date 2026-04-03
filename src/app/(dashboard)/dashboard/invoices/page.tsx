@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { Plus, FileText } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getUser } from '@/lib/auth/get-user'
+import { getSelectedOrgId } from '@/lib/org-switcher'
 import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -42,12 +44,23 @@ export default async function InvoicesPage() {
   const userData = await getUser()
   if (!userData) redirect('/login')
 
-  const supabase = await createClient()
+  const { profile } = userData
+  const isSuperAdmin = profile.role === 'super_admin'
+  const selectedOrgId = isSuperAdmin ? await getSelectedOrgId() : null
+  const supabase = isSuperAdmin ? createAdminClient() : await createClient()
 
-  const { data: invoices } = await supabase
+  let invoicesQuery = supabase
     .from('invoices')
     .select('*, organizations(name)')
     .order('created_at', { ascending: false })
+
+  if (isSuperAdmin && selectedOrgId) {
+    invoicesQuery = invoicesQuery.eq('organization_id', selectedOrgId)
+  } else if (!isSuperAdmin && profile.organization_id) {
+    invoicesQuery = invoicesQuery.eq('organization_id', profile.organization_id)
+  }
+
+  const { data: invoices } = await invoicesQuery
 
   const rows = (invoices ?? []).map((inv) => ({
     id: inv.id as string,
