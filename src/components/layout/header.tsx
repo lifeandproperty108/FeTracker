@@ -46,9 +46,11 @@ interface HeaderProps {
   orgName: string
   role: UserRole
   showMobileSidebar?: boolean
+  hasSelectedOrg?: boolean
+  topContent?: React.ReactNode
 }
 
-export function Header({ userName, orgName, role, showMobileSidebar = true }: HeaderProps) {
+export function Header({ userName, orgName, role, showMobileSidebar = true, hasSelectedOrg, topContent }: HeaderProps) {
   const router = useRouter()
 
   async function handleSignOut() {
@@ -77,7 +79,7 @@ export function Header({ userName, orgName, role, showMobileSidebar = true }: He
                     <span className="font-heading text-red-600 font-bold text-lg">FE Tracker</span>
                   </SheetTitle>
                 </SheetHeader>
-                <Sidebar role={role} variant="inline" />
+                <Sidebar role={role} variant="inline" hasSelectedOrg={hasSelectedOrg} topContent={topContent} />
               </SheetContent>
             </Sheet>
           )}
@@ -92,7 +94,9 @@ export function Header({ userName, orgName, role, showMobileSidebar = true }: He
 
           <DropdownMenu>
             <DropdownMenuTrigger
-              className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 outline-none"
+              render={
+                <button className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 outline-none" />
+              }
             >
               <Avatar size="sm" className="ring-2 ring-gray-200 dark:ring-gray-700">
                 <AvatarFallback>{getInitials(userName)}</AvatarFallback>

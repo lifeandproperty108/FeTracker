@@ -22,13 +22,20 @@ interface MobileNavItem {
   icon: React.ComponentType<{ className?: string }>
 }
 
-function getMobileNavItems(role: UserRole): MobileNavItem[] {
+function getMobileNavItems(role: UserRole, hasSelectedOrg?: boolean): MobileNavItem[] {
   switch (role) {
     case 'super_admin':
+      if (hasSelectedOrg) {
+        return [
+          { label: 'Admin Panel', href: '/super-admin', icon: LayoutDashboard },
+          { label: 'Dashboard', href: '/dashboard', icon: BarChart3 },
+          { label: 'Locations', href: '/dashboard/locations', icon: MapPin },
+          { label: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
+        ]
+      }
       return [
         { label: 'Dashboard', href: '/super-admin', icon: LayoutDashboard },
         { label: 'Orgs', href: '/super-admin/organizations', icon: Building2 },
-        { label: 'Invoices', href: '/super-admin/invoices', icon: Receipt },
       ]
     case 'org_admin':
       return [
@@ -58,9 +65,9 @@ function getMobileNavItems(role: UserRole): MobileNavItem[] {
   }
 }
 
-export function MobileNav({ role }: { role: UserRole }) {
+export function MobileNav({ role, hasSelectedOrg }: { role: UserRole; hasSelectedOrg?: boolean }) {
   const pathname = usePathname()
-  const navItems = getMobileNavItems(role)
+  const navItems = getMobileNavItems(role, hasSelectedOrg)
 
   return (
     <nav className="lg:hidden fixed bottom-0 inset-x-0 z-50 border-t border-gray-200 dark:border-gray-800 bg-background">
@@ -76,6 +83,7 @@ export function MobileNav({ role }: { role: UserRole }) {
             <Link
               key={item.href}
               href={item.href}
+              data-tour={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
               className={cn(
                 'flex flex-col items-center gap-1 px-3 py-1.5 rounded-lg text-xs transition-all duration-200 min-w-0 relative',
                 isActive

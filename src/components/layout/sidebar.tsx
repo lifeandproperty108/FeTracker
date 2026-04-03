@@ -25,14 +25,25 @@ interface NavItem {
   badge?: string
 }
 
-function getNavItems(role: UserRole): NavItem[] {
+function getNavItems(role: UserRole, hasSelectedOrg?: boolean): NavItem[] {
   switch (role) {
     case 'super_admin':
+      if (hasSelectedOrg) {
+        return [
+          { label: 'Admin Panel', href: '/super-admin', icon: LayoutDashboard },
+          { label: 'Dashboard', href: '/dashboard', icon: BarChart3 },
+          { label: 'Locations', href: '/dashboard/locations', icon: MapPin },
+          { label: 'Team', href: '/dashboard/team', icon: Users },
+          { label: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
+          { label: 'Quotes', href: '/dashboard/quotes', icon: FileText },
+          { label: 'Invoices', href: '/dashboard/invoices', icon: Receipt },
+          { label: 'Inspect', href: '/inspect', icon: ClipboardList },
+          { label: 'Settings', href: '/dashboard/settings', icon: Settings },
+        ]
+      }
       return [
         { label: 'Dashboard', href: '/super-admin', icon: LayoutDashboard },
         { label: 'Organizations', href: '/super-admin/organizations', icon: Building2 },
-        { label: 'Invoices', href: '/super-admin/invoices', icon: Receipt },
-        { label: 'Quotes', href: '/super-admin/quotes', icon: FileText },
       ]
     case 'org_admin':
       return [
@@ -71,16 +82,22 @@ export type { NavItem }
 export function Sidebar({
   role,
   variant = 'desktop',
+  hasSelectedOrg,
+  topContent,
 }: {
   role: UserRole
   variant?: 'desktop' | 'inline'
+  hasSelectedOrg?: boolean
+  topContent?: React.ReactNode
 }) {
   const pathname = usePathname()
-  const navItems = getNavItems(role)
+  const navItems = getNavItems(role, hasSelectedOrg)
 
   if (variant === 'inline') {
     return (
-      <nav className="flex flex-1 flex-col gap-1.5 p-4 overflow-y-auto">
+      <>
+        {topContent}
+        <nav className="flex flex-1 flex-col gap-1.5 p-4 overflow-y-auto">
         {navItems.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -92,6 +109,7 @@ export function Sidebar({
             <Link
               key={item.href}
               href={item.href}
+              data-tour={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
               className={cn(
                 'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
                 isActive
@@ -110,14 +128,13 @@ export function Sidebar({
           )
         })}
       </nav>
+      </>
     )
   }
 
   return (
     <aside className="hidden lg:flex lg:w-60 lg:flex-col lg:fixed lg:inset-y-0 lg:top-14 lg:border-r lg:border-border bg-background z-30">
-      <div className="px-4 py-4 border-b border-gray-200 dark:border-gray-800">
-        <span className="font-heading text-red-600 font-bold text-lg select-none">FE Tracker</span>
-      </div>
+      {topContent}
       <nav className="flex flex-1 flex-col gap-1.5 p-4 overflow-y-auto">
         {navItems.map((item) => {
           const isActive =
@@ -130,6 +147,7 @@ export function Sidebar({
             <Link
               key={item.href}
               href={item.href}
+              data-tour={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
               className={cn(
                 'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
                 isActive
