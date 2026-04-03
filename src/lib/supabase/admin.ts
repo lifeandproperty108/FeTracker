@@ -1,12 +1,12 @@
 import { createClient } from '@supabase/supabase-js'
-import { getServerSupabasePublicConfig } from './config'
+import { getServerSupabaseAdminConfig } from './config'
 
 export function createAdminClient() {
-  const config = getServerSupabasePublicConfig()
+  const config = getServerSupabaseAdminConfig()
 
   return createClient(
     config.url,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    config.adminKey,
     { auth: { autoRefreshToken: false, persistSession: false } }
   )
 }

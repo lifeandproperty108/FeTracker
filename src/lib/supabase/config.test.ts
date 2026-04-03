@@ -2,7 +2,9 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import {
+  getServerSupabaseAdminConfig,
   getBrowserSupabasePublicConfig,
+  resolveSupabaseAdminConfig,
   resolveSupabasePublicConfig,
 } from './config.ts'
 
@@ -42,4 +44,52 @@ test('browser config prefers publishable key and falls back to anon key', () => 
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = previousAnonKey
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY =
     previousPublishableKey
+})
+
+test('admin config prefers secret key and falls back to service role key', () => {
+  assert.deepEqual(
+    resolveSupabaseAdminConfig({
+      SUPABASE_URL: 'https://admin.example.co',
+      SUPABASE_PUBLISHABLE_KEY: 'publishable-key',
+      SUPABASE_SECRET_KEY: 'secret-key',
+      SUPABASE_SERVICE_ROLE_KEY: 'service-role-key',
+    }),
+    {
+      url: 'https://admin.example.co',
+      adminKey: 'secret-key',
+    }
+  )
+
+  assert.deepEqual(
+    resolveSupabaseAdminConfig({
+      SUPABASE_URL: 'https://admin.example.co',
+      SUPABASE_ANON_KEY: 'anon-key',
+      SUPABASE_SERVICE_ROLE_KEY: 'service-role-key',
+    }),
+    {
+      url: 'https://admin.example.co',
+      adminKey: 'service-role-key',
+    }
+  )
+})
+
+test('server admin config reads runtime environment', () => {
+  const previousUrl = process.env.SUPABASE_URL
+  const previousPublishableKey = process.env.SUPABASE_PUBLISHABLE_KEY
+  const previousSecretKey = process.env.SUPABASE_SECRET_KEY
+  const previousServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  process.env.SUPABASE_URL = 'https://runtime-admin.example.co'
+  process.env.SUPABASE_PUBLISHABLE_KEY = 'runtime-publishable-key'
+  process.env.SUPABASE_SECRET_KEY = 'runtime-secret-key'
+
+  assert.deepEqual(getServerSupabaseAdminConfig(), {
+    url: 'https://runtime-admin.example.co',
+    adminKey: 'runtime-secret-key',
+  })
+
+  process.env.SUPABASE_URL = previousUrl
+  process.env.SUPABASE_PUBLISHABLE_KEY = previousPublishableKey
+  process.env.SUPABASE_SECRET_KEY = previousSecretKey
+  process.env.SUPABASE_SERVICE_ROLE_KEY = previousServiceRoleKey
 })

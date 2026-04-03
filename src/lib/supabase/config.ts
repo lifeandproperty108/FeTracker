@@ -15,8 +15,27 @@ export function resolveSupabasePublicConfig(
   return { url, anonKey }
 }
 
+export function resolveSupabaseAdminConfig(
+  env: Record<string, string | undefined>
+) {
+  const { url } = resolveSupabasePublicConfig(env)
+  const adminKey =
+    env.SUPABASE_SECRET_KEY ??
+    env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!adminKey) {
+    throw new Error('Missing Supabase admin configuration')
+  }
+
+  return { url, adminKey }
+}
+
 export function getServerSupabasePublicConfig() {
   return resolveSupabasePublicConfig(process.env)
+}
+
+export function getServerSupabaseAdminConfig() {
+  return resolveSupabaseAdminConfig(process.env)
 }
 
 export function getBrowserSupabasePublicConfig() {
